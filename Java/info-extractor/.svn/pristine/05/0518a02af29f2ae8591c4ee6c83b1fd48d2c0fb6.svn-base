@@ -1,0 +1,52 @@
+<syntun id = "jd">   
+    <domain>item.jd.com,item.jd.hk</domain>
+    <method>xpath</method>
+    <selectors>
+	<selector id = "test">
+        <item>
+            <type>text</type>
+            <name>title</name>
+            <xpath>html title</xpath>
+            <regex></regex>
+        </item>
+    </selector>
+    <selector id = "a">
+        <item>
+            <type>text</type>
+            <name>ID</name>
+            
+        </item>
+        <item>
+            <type>text</type>
+            <name>title</name>
+            <xpath>div[id=product-intro] div[class=m-item-inner] div[id=itemInfo] div[id=name] h1</xpath>
+            <regex></regex>
+
+        </item>
+        <item>
+            <type>text</type>
+            <name>category</name>
+            <xpath>div[id=root-nav] div[class=w] div[class=breadcrumb] span</xpath>
+            <regex></regex>
+        </item>
+    </selector>
+      
+
+
+    <selector id = "quanqiugou">
+        <item>
+            <type>text</type>
+            <name>ID</name>
+            <xpath>html[class=root61] body div[class=product-detail w] div[id=preview] div[id=short-share] div[id=summary-market] span</xpath>
+            <regex></regex>
+        </item>
+        <item>
+            <type>text</type>
+            <name>title</name>
+            <xpath>html[class=root61] body div[class=product-detail w] div[class=detail-items ] div[id=itemInfo] div[id=name] h1</xpath>
+            <regex></regex>
+        </item>
+    </selector>
+    </selectors>
+    
+</syntun>

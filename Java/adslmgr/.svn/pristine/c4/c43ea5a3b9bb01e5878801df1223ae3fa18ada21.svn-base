@@ -1,0 +1,168 @@
+package com.syntun.crawler;
+
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
+public class RequestManager {
+	private static int MAX_REDIRECT_COUNT = 20;
+	private List<FetcherRequestInfo> m_reqList = Collections.synchronizedList(new ArrayList<FetcherRequestInfo>());
+	private int m_reqCount = 0;
+	private int m_errCount = 0;
+	
+	private UrlSelectConsumer m_urlSelect = new UrlSelectConsumer();
+	//private List<JSONObject> m_objects = Collections.synchronizedList(new ArrayList<JSONObject>());
+	private int m_minLoad = 100; //最小需要加载的数量
+	private static Logger logger = LogManager.getLogger(FetcherThread.class.getName());
+	private AdslManager m_adslMgr = new AdslManager();
+	private RawPageProducer m_rawPageProducer = new RawPageProducer();
+	
+	public boolean init(){
+		boolean ret = false;
+		ret = m_urlSelect.init(CrawlerConfig.BROKER_LIST, CrawlerConfig.BROKER_PORT, CrawlerConfig.URL_SELECTOR_TOPIC, CrawlerConfig.URL_SELECTOR_PARTITION);
+		if(!ret){
+			logger.error("Can not init urlSelectConsumer.");
+			return false;
+		}
+		ret = m_adslMgr.init();
+		if(!ret){
+			logger.error("Can not init AdslManager.");
+			return false;
+		}
+		ret = m_rawPageProducer.init();
+		if(!ret){
+			logger.error("Can not init RawPageProducer.");
+			return false;
+		}
+		m_rawPageProducer.start();
+		logger.debug("RawPageProducer started.");
+		return ret;
+	}
+		
+	public synchronized FetcherRequestInfo getRequest(){ //获取一个请求
+		
+		while(m_reqList.size() < m_minLoad){
+			List<JSONObject> newMsgs = m_urlSelect.getDataFromKafka();
+			if(newMsgs == null){
+				logger.error("Can not get msg from kafka.");
+				break;
+			}
+			else{
+				
+				//m_objects.addAll(newMsgs);
+				for(int i = 0; i < newMsgs.size(); ++i){
+					JSONObject obj = newMsgs.get(i);
+					try{
+						FetcherRequestInfo req = new FetcherRequestInfo(obj);
+						m_reqList.add(req);
+					}catch (URISyntaxException e) {
+						logger.error("Invalid url.");
+						m_errCount++;
+						e.printStackTrace();
+					}
+				}
+				m_reqCount+=newMsgs.size();
+				logger.debug("TotalRequest:" + m_reqCount + " ,ErrorCount:" + m_errCount);
+		
+				break;
+			}
+		}
+		
+		if(m_reqList.size() <= 0){
+			return null;
+		}
+		
+		
+		return m_adslMgr.getRequest(m_reqList);
+
+	}
+	
+	public void onResponse(FetcherRequestInfo reqInfo, FetcherResponse rsp){
+		
+		long curTime = System.currentTimeMillis();
+		String strJson = null;
+		
+		//去掉busy属性
+		m_adslMgr.setAccessTime(reqInfo.getUri().getHost(), reqInfo.getLocalIp(), reqInfo.getRemoteIp());
+		m_adslMgr.setBusy(reqInfo.getUri().getHost(), reqInfo.getLocalIp(), reqInfo.getRemoteIp(), false);
+		
+		if(rsp != null){
+			if(rsp.getCode() >=400){//错误计数+1
+				m_adslMgr.incErrCount(reqInfo.getUri().getHost(), reqInfo.getLocalIp(), reqInfo.getRemoteIp());
+				m_errCount++;
+			}
+			if(rsp.getCode() == 302 || rsp.getCode() == 301){
+				if(reqInfo.getRedirectCount() >= MAX_REDIRECT_COUNT){
+					logger.error("Max redirect count reached.");
+				}
+				else if(rsp.getLocation() == null){
+					m_adslMgr.incErrCount(reqInfo.getUri().getHost(), reqInfo.getLocalIp(), reqInfo.getRemoteIp());
+					logger.error("No location for code 302.");
+				}
+				else{
+					//跳转指令，重新插入抓取队列
+					URI uri;
+					try {
+						logger.debug("Redirect to:"+rsp.getLocation());
+						uri = new URI(rsp.getLocation());
+						reqInfo.setUri(uri);
+						reqInfo.setReferer(reqInfo.getOrigUrl());
+						reqInfo.setOrigUrl(rsp.getLocation());
+						reqInfo.incRedirectCount();
+						synchronized(m_reqList){
+							//插入队列头
+							m_reqList.add(0, reqInfo);
+						}
+						return;
+					} catch (URISyntaxException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			//输出页面（包含错误页面）
+			JSONObject jsonResponse = new JSONObject();
+			jsonResponse.put("http_status", rsp.getCode());
+			jsonResponse.put("http_content", rsp.getBody());
+			jsonResponse.put("error", 0);
+			jsonResponse.put("end_time", curTime);
+			jsonResponse.put("response_route", reqInfo.getRedirectList());
+			JSONObject jsonResult = new JSONObject();
+			jsonResult.put("url_record", reqInfo.getMsg());
+			jsonResult.put("http_response", jsonResponse);
+			strJson = jsonResult.toString();
+		}
+		else{
+			m_adslMgr.incErrCount(reqInfo.getUri().getHost(), reqInfo.getLocalIp(), reqInfo.getRemoteIp());
+			JSONObject jsonResponse = new JSONObject();
+			jsonResponse.put("http_status", 0);
+			jsonResponse.put("http_content", "");
+			jsonResponse.put("error", 1);
+			jsonResponse.put("end_time", curTime);
+			JSONObject jsonResult = new JSONObject();
+			jsonResult.put("url_record", reqInfo.getMsg());
+			jsonResult.put("http_response", jsonResponse);
+			strJson = jsonResult.toString();
+		}
+		
+		this.m_rawPageProducer.postRawPage(strJson, reqInfo.getOrigUrl());//使用最后一个url做key
+//		System.out.println("Fetch done.");
+//		System.out.println("Code:"+ String.valueOf(rsp.getCode()));
+//		System.out.println("Body:" + String.valueOf(rsp.getBody().length()));
+		//CookieStore cookieStore = (CookieStore) reqInfo.getContext().getAttribute(HttpClientContext.COOKIE_STORE);
+		//System.out.println("Cookie:" + cookieStore.toString());
+		return;
+	}
+}

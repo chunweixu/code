@@ -1,0 +1,126 @@
+package com.syntun.extractor;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class PageInfoTemplate {
+	private static Logger logger = LogManager.getLogger(PageInfoTemplate.class.getName());
+    private List<Selector> selectorList = null;
+    private String[] domains = null;
+    private String type = null;
+
+    public List<Selector> getSelectorList() {
+		return selectorList;
+	}
+
+	public String[] getDomains() {
+		return domains;
+	}
+
+	public String getType() {
+		return type;
+	}
+	
+	public List<Map<String, String>> getPageInfo(String content, String baseUri) {
+		return extractPageInfo(content, baseUri);
+	}
+	
+	private boolean parseSelector(Document root) {
+		Elements elements = root.getElementsByTag("selector");
+		if (type.equals("xpath")) {
+			selectorList = new ArrayList<Selector>();
+			for (Element element : elements) {
+				Selector selector = new XpathSelector();
+				if (selector.initSelector(element)) {
+					selectorList.add(selector);	
+				} else {
+					logger.error("Parse selector failure");
+					return false;
+				}
+			}
+		}
+		else if (type.equals("json")) {
+			selectorList = new ArrayList<Selector>();
+			for (Element element : elements) {
+				Selector selector = new JsonSelector();
+				if (selector.initSelector(element)) {
+					selectorList.add(selector);	
+				} else {
+					logger.error("Parse selector failure");
+					return false;
+				}
+			}
+		} else {
+			logger.error("Invalid parse type: method");
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean parseDomains(Document root) {
+		Elements elements = root.getElementsByTag("domain");
+		if (elements.size() != 1) {
+			logger.error("Invalid config node: domain");
+			return false;
+		}
+		domains = elements.get(0).text().trim().split(",");
+		return true;
+	}
+	
+	private boolean parseType(Document root) {
+		Elements elements = root.getElementsByTag("method");
+		if (elements.size() != 1) {
+			logger.error("Invalid config node: method");
+			return false;
+		}
+		type = elements.get(0).text().trim();
+		return true;
+	}
+	
+	public boolean initTemplate(String fileName) {
+		Document root = null;
+		try {
+			root = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		
+		if (!parseDomains(root)) {
+			return false;
+		}
+		if (!parseType(root)) {
+			return false;
+		}
+		if (!parseSelector(root)) {
+			return false;
+		}
+		return true;
+	}
+	
+	private List<Map<String, String>> extractPageInfo(String content, String baseUri) {
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		for (Selector selector : selectorList) {
+			Map<String,String> mapResult = selector.extractSelectorInfo(content, baseUri);
+			
+			if (mapResult != null) {
+			    list.add(mapResult);
+			}
+		}
+		if (list.size() == 0) {
+			logger.warn("Extract templateInfo nothing: " + baseUri);
+			return null;
+		} else {
+		    return list;
+		}
+	}
+}

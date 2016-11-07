@@ -1,0 +1,105 @@
+package com.syntun.extractor;
+
+import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
+
+import gnu.getopt.Getopt;
+
+public class InfoExtractor {
+	
+	public static Logger logger = null;
+	private static int RAWPAGE_QUEUE_SIZE = 1024;
+	
+	public static BlockingQueue<String> rawpageQueue = new LinkedBlockingQueue<String>(RAWPAGE_QUEUE_SIZE);
+	
+	public static void printUsage(){
+		System.err.println("Usage:");
+		System.err.println("\tInfoExtractor -c [config_file] -l [log_path] -n [log_file_name] ");
+	}
+	
+	public static boolean initLogger(){
+		logger = LogManager.getLogger(InfoExtractor.class.getName());
+		return true;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Getopt getOpt = new Getopt("scrawler",args,"c:l:n:");
+		int c = 0;
+		String configPath = null;
+		String logPath = null;
+		String logFileName = null;
+		boolean daemon = false;
+		while((c=getOpt.getopt())!= -1){
+			switch(c){
+			case 'c':
+				configPath = getOpt.getOptarg();
+				break;
+			case 'l':
+				logPath = getOpt.getOptarg();
+				break;
+			case 'n':
+				logFileName = getOpt.getOptarg();
+				break;
+			default:
+				System.out.println("Invalid option - " + c);
+				printUsage();
+				System.exit(-1);
+				return;
+			}
+		}
+		
+		if(logPath != null && logFileName != null){
+			System.setProperty("log_path",logPath);
+			System.setProperty("log_file_name",logFileName);
+		}
+		else{
+			System.err.println("Invalid log config.");
+			printUsage();
+			System.exit(-1);
+			return;
+		}
+		
+		if(configPath == null || configPath.isEmpty()){
+			System.err.println("Invalid config file.");
+			printUsage();
+			System.exit(-1);
+			return;
+		}
+		
+		if(!initLogger()){
+			System.err.println("Init logger failed.");
+			System.exit(-1);
+			return;
+		}
+		
+		//load config
+		InfoExtractorConfig config = new InfoExtractorConfig();
+		if(!config.loadConfig(configPath)){
+			System.err.println("Error on loading config.");
+			System.exit(-1);
+			return;
+		}
+		
+		//初始化Input
+		RawPageConsumer consumer = new RawPageConsumer();
+		HashMap<String, String> mapRawPageConfig = config.getMapConfigRawpage();
+		consumer.init(mapRawPageConfig.get("zookeeper"), mapRawPageConfig.get("topic")
+				, mapRawPageConfig.get("group"), rawpageQueue);
+		
+		Thread rawpageThread = new Thread(consumer);
+		rawpageThread.start();
+		
+		//初始化插件
+		ExtractorManager extractorManager = new ExtractorManager();
+		
+		
+	}
+
+}

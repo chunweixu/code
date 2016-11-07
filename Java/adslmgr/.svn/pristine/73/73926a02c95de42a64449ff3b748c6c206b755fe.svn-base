@@ -1,0 +1,33 @@
+package com.syntun.crawler;
+
+import java.io.IOException;
+import java.net.CookieStore;
+
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.util.EntityUtils;
+
+public class FetcherResponseHandler implements ResponseHandler<FetcherResponse> {
+
+	public FetcherResponse handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+		FetcherResponse ret = new FetcherResponse();
+		
+		ret.setHeaders(response.getAllHeaders());
+		ret.setCode(response.getStatusLine().getStatusCode());
+		String body = EntityUtils.toString(response.getEntity());
+		ret.setBody(body);
+		//判断是否跳转，跳转保存location
+		if(302 == response.getStatusLine().getStatusCode()
+				|| 301 == response.getStatusLine().getStatusCode()){
+			Header hdrLocation = response.getLastHeader("Location");
+			if(hdrLocation == null){
+				ret.setLocation(null);
+			}
+			ret.setLocation(hdrLocation.getValue());
+		}
+		return ret;
+	}
+
+}

@@ -1,0 +1,14 @@
+package com.syntun.extractor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.jsoup.nodes.Element;
+
+public interface Selector {
+	public String getSelectorId();
+	public Set<ItemNode> getNodes();
+	public boolean initSelector(Element element);
+	public List<Map<String, String>> extractPageInfo(String content, String baseUri, List<Selector> selectorList);
+}

@@ -1,0 +1,57 @@
+package com.syntun.extractor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import com.syntun.extractor.Selector.Node;
+
+public class WebInfoExtractor {
+	
+	 static WebInfoConfig config = new WebInfoConfig();
+		public List<Selector> ExtractWebInfo(String html, String baseUri, String fileName) {
+	    	List<Selector> list = config.parseXml(fileName);
+	    	
+	    	Document doc = Jsoup.parse(html, baseUri);
+	    	for (Selector selector : list) {
+	    		for (Node obj : selector.getNodes()) {
+		    		selectInfo(doc, obj);
+	    		}
+	    	}
+	        return list;
+	    }
+	    
+	    private static void selectInfo(Document doc, Node node) {
+	    	if (node.getType().equals("text")) {
+	    		Elements elements = doc.select(node.getXpath());
+	    		String value=elements.text();
+	        	if (!node.getRegex().equals("")) {
+	        		value=getToken(elements.text(), node.getRegex());
+	        	}
+	        	node.setNodeParseValue(value);
+	    	}else if (node.getType().equals("img")) {
+	    		Elements elements = doc.select(node.getXpath() + "[src]");
+	    		String value=elements.text();
+	    		if (!node.getRegex().equals("")) {
+	    			value=getToken(elements.attr("abs:src"), node.getRegex());
+	        	}
+	    		node.setNodeParseValue(value);
+	    	}
+	    }
+	    
+	    private static String getToken(String text, String pattern) {
+	    	ArrayList<String> tokens = new ArrayList<String>();
+			Pattern tokSplitter = Pattern.compile(pattern);
+			Matcher m = tokSplitter.matcher(text);
+			while (m.find()) {
+				tokens.add(m.group());
+			}
+			return tokens.toString();
+	    }
+
+}

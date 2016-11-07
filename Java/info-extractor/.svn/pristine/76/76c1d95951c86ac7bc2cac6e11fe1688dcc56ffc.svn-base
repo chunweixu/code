@@ -1,0 +1,33 @@
+package com.syntun.extractor;
+
+import java.util.List;
+
+public class WebInfoTemplate {
+    private List<String> domain;
+    private String type;
+    private List<Selector> selectorList;
+	public List<String> getDomain() {
+		return domain;
+	}
+	public void setDomain(List<String> domain) {
+		this.domain = domain;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public List<Selector> getSelectorList() {
+		return selectorList;
+	}
+	public void setSelectorList(List<Selector> selectorList) {
+		this.selectorList = selectorList;
+	}
+	@Override
+	public String toString() {
+		return "WebInfoTemplate [domain=" + domain + ", type=" + type
+				+ ", selectorList=" + selectorList + "]";
+	}
+	
+}

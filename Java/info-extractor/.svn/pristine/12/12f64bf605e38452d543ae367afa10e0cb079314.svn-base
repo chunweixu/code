@@ -1,0 +1,75 @@
+package com.syntun.extractor;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
+import com.syntun.extractor.Selector.Node;
+
+public class ExtractorImpl implements Extractor {
+	private static Logger log = LogManager.getLogger(ExtractorImpl.class.getName());
+	private Map<String, String> map = new HashMap<String, String>();
+	private WebInfoExtractor webInfo = new WebInfoExtractor();
+	private String fileDir=null;
+	public boolean init(InfoExtractorConfig config) {
+		config.loadConfig("./config/configTest.xml");
+		WebInfoConfig webConfig = new WebInfoConfig();
+		String xmlName=config.getExtractorConfig("PageType").get("rulefile");
+		fileDir = webConfig.getNodeValue(xmlName);
+		map = webConfig.getDomainsByXml(xmlName);
+		
+		return true;
+	}
+
+	public boolean run(JSONObject ctxt) {
+		String baseUri = ctxt.getString("url");
+		try {
+			String domain=new URI(baseUri).getHost();	
+			if (!map.containsKey(domain)) {
+				log.error("配置文件中没有找到"+domain);
+				return false;
+			}
+			String fileName = map.get(domain);
+			List<Selector> result = webInfo.ExtractWebInfo(ctxt.getString("http_content"), baseUri, fileDir + fileName);
+			for (Selector selector : result) {
+				for (Node node : selector.getNodes()) {
+					if (node.getNodeParseValue().isEmpty()) {
+						continue;
+				    } else {
+					ctxt.put(node.getName(), node.getNodeParseValue());
+				    }
+			    }  
+		    }	
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	public void close() {
+		map.clear();
+		System.gc();
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+//	public static void main(String[] args) {
+//		JSONObject json = new JSONObject();
+//		json.put("url", "http://item.jd.com/896813.html");
+//		json.put("http_content", "<html><title>123456</title><body><div>1234<div></body></html>");
+//	    ExtractorImpl extract = new ExtractorImpl();
+//	    extract.init(new InfoExtractorConfig());
+//	    //System.out.println(extract.map.toString());
+//	    extract.run(json);
+//	    System.out.println(json);
+//	}
+}

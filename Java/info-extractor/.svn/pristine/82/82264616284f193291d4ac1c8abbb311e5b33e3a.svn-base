@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datas>
+    <!--
+    SHOPINFO 店铺信息
+    RODUCT_EXT_INFO 商品扩展信息，包括促销，价格,价格页面抓取参数，领劵促销，团购促销等等。
+    COMMENT  评论 
+    PRODUCT  单品
+    USERINFO  用户
+    -->
+	<data>
+		<platform>jd</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://mall.jd.com/shopLevel-\d+.html</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://jprice.jd.com/adslogan/\d+-setproductadwords.ad</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://bank.market.360buy.com/bank/show_index.action\?callback=jsonp1371544260032._=1371544270985.sku=[a-zA-Z0-9]+.csId=[a-zA-Z0-9]+</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://p.3.cn/prices/get?skuid=J_[a-zA-Z0-9]+.type=1.callback=changeImgPrice2Num</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://pi.3.cn/promoinfo/get\?id=[a-zA-Z0-9]+.callback=Promotions.set</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://bank.market.360buy.com/bank/show_index.action\?callback=jQuery8622809.sku=[a-zA-Z0-9]+.csId=880</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://club.jd.com/review/[a-zA-Z0-9]+-0-1-0.html</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://club.jd.com/review/[a-zA-Z0-9]+-0-\d+-0.html</regx>
+	</data>
+	<data>
+		<platform>tmall</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://rate.tmall.com/list_detail_rate.htm\?itemId=[a-zA-Z0-9]+.spuId=.sellerId=[a-zA-Z0-9]+.currentPage=1</regx>
+	</data>
+	<data>
+		<platform>tmall</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://rate.tmall.com/list_detail_rate.htm\?itemId=[a-zA-Z0-9]+.spuId=.sellerId=[a-zA-Z0-9]+.currentPage=\d+</regx>
+	</data>
+	<data>
+		<platform>tmall</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://rate.taobao.com/user-rate-[a-zA-Z0-9]+.htm</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://www.suning.com/webapp/wcs/stores/ItemPrice/\d+_[a-zA-Z0-9]+_9017__1.html</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://www.suning.com/emall/snshowpromtag_10052_10051_31_9017_\d+_[a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9\.]+_processNewPromInfo_.html</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://www.suning.com/emall/snsearchprom_10052_10051_1__9017_10_\d+_[a-zA-Z0-9]+_99.00_99.00__C_FourPage.showPromStatus_.html</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>RODUCT_EXT_INFO</pageType><!--价格页面抓取参数-->
+		<regx>(?:http|https)://www.suning.com/emall/psl_10052_10051_\d+_9017_10106_FourPage.showShopList_.html\?callback=FourPage.showShopList</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://www.suning.com/ajax/review_lists/general-000000000[a-zA-Z0-9]+-[a-zA-Z0-9]+-total-\d+-default-10-----reviewList.htm</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://www.suning.com/ajax/getShopHeadInfo_[a-zA-Z0-9]+.html</regx>
+	</data>
+	<data>
+		<platform>gome</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://www.gome.com.cn/ec/homeus/n/product/browse/getProductLimitbuyAndGrouponJsonData.jsp\?callback=test.productId=[a-zA-Z0-9]+.skuId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>gome</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://ss.gome.com.cn/ec/homeus/n/product/browse/getProductDetail.jsp?callback=cb_429990474367514.productId=[a-zA-Z0-9]+.skuId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>gome</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://g.gome.com.cn/ec/homeus/browse/store.jsp?callback=jQuery17109253101195208728_1430879381234.goodsNo=\d+.city=11011400.areaId=110114001.siteId_p=.skuType_p=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>gome</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://ss.gome.com.cn/ec/homeus/n/product/gadgets/prdevajsonp/appraiseModuleAjax.jsp\?callback=all.productId=[a-zA-Z0-9]+.pagenum=\d+</regx>
+	</data>
+	<data>
+		<platform>gome</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://mall.gome.com.cn/\d+</regx>
+	</data>
+	<data>
+		<platform>yixun</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://item.51buy.com/p/CGINewPromotion\?cids1=1009.cids2=1226.cids3=738.pid=\d+.whid=2001</regx>
+	</data>
+	<data>
+		<platform>yixun</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://pinglun.yixun.com/json1.php\?mod=reviews.act=getproperty.jsontype=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yixun</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://pinglun.yixun.com/json1.php\?mod=reviews.act=getreviews.jsontype=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yixun</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://d.dashou.yixun.com/dashou/querydashoudata\?whId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://busystock.i.yihaodian.com/restful/detail\?mcsite=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://item-home.yhd.com/item/ajax/ajaxProductPromotion.do\?callback=detailPromotion.reduceScrollbar.productID=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://www.yihaodian.com/item/ajax/ajaxPmInfoExchangePoint.do?productMercantID=\d+</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://gps.yhd.com/restful/detail\?mcsite=1.provinceId=2.pmId=\d+</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://club.yhd.com/review/[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://club.yhd.com/review/\d+-\d+</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://shop.yhd.com/interface/showDSRInfo.action\?jsonpCallback=storeJsonpMethods.callbackMethods.showMyDsr.merchantId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://shop.yhd.com/productExperience/proExperienceAction!ajaxView_pe.do\?product.id=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://shop.yhd.com/productExperience/proExperienceAction!ajaxView_pe.do\?product.id=\d+.pagenationVO.currentPage=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>dangdang</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://product.dangdang.com/comment/comment.php\?[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>dangdang</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://shop.dangdang.com/\d+\?act=evaluate.ref=shop-2-AC-03</regx>
+	</data>
+	<data>
+		<platform>amazon</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.amazon.cn/dp/[a-zA-Z0-9]+[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>amazon</platform>
+		<pageType>RODUCT_EXT_INFO</pageType>
+		<regx>(?:http|https)://www.amazon.cn/dp/collect-coupon/handler/get_more_coupons.html\?asin=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>amazon</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://www.amazon.cn/product-reviews/[a-zA-Z0-9]+/ref=cm_cr_pr_top_link_1\?ie=UTF8.showViewpoints=1.sortBy=bySubmissionDateDescending</regx>
+	</data>
+	<data>
+		<platform>amazon</platform>
+		<pageType>COMMENT</pageType>
+		<regx>(?:http|https)://www.amazon.cn/product-reviews/[a-zA-Z0-9]+/ref=cm_cr_pr_btm_link_next_0\?ie=UTF8.pageNumber=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>amazon</platform>
+		<pageType>SHOPINFO</pageType>
+		<regx>(?:http|https)://www.amazon.cn/gp/aag/details/ref=aag_m_ss\?ie=UTF8.asin=B00BQ8RM1A.isAmazonFulfilled=0.isCBA=.marketplaceID=AAHKV2X7AFYLW.seller=[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>jd</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://item.jd.com/\d+.html</regx>
+	</data>
+	<data>
+		<platform>tmall</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://detail.tmall.com/item.htm\?.*</regx>
+	</data>
+	<data>
+		<platform>818</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.818.com/DrugDetails_\d+.shtml</regx>
+	</data>
+	<data>
+		<platform>j1</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.j1.com/product/\d+-+\d+.html</regx>
+	</data>
+	<data>
+		<platform>111</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.111.com.cn/product/\d+.html</regx>
+	</data>
+	<data>
+		<platform>ehaoyao</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.ehaoyao.com/product-\d+.html</regx>
+	</data>
+	<data>
+		<platform>kad</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.360kad.com/product/\d+.shtml</regx>
+	</data>
+	<data>
+		<platform>lbx</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.lbxcn.com/item/\d+.html</regx>
+	</data>
+	<data>
+		<platform>star365</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.star365.com/Products/\d+.html</regx>
+	</data>
+	<data>
+		<platform>jxdyf</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.jxdyf.com/product/\d+.html</regx>
+	</data>
+	<data>
+		<platform>360kxr</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.360kxr.com/product/\d+.html</regx>
+	</data>
+	<data>
+		<platform>91yao</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.91yao.com/product/\d+.shtml</regx>
+	</data>
+	<data>
+		<platform>7lk</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.7lk.com.*goods/.*</regx>
+	</data>
+	<data>
+		<platform>jingyw</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.jingyw.com/product/detail.aspx\?[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>drugoogle</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.drugoogle.com/index/medicinefindDetail.htm\?[\s\S]*?</regx>
+	</data>
+	<data>
+		<platform>yhd</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://item.yhd.com/item/.*</regx>
+	</data>
+	<data>
+		<platform>yixun</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://item.yixun.com/item.*</regx>
+	</data>
+	<data>
+		<platform>suning</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://product.suning.com/.*</regx>
+	</data>
+	<data>
+		<platform>gome</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://item.gome.com.cn/.*</regx>
+	</data>
+	<data>
+		<platform>dangdang</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://product.dangdang.com/\d+.html</regx>
+	</data>
+	<data>
+		<platform>jumei</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://item.jumei.com/.*</regx>
+	</data>
+	<data>
+		<platform>jumei</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://item.jumeiglobal.com/.*</regx>
+	</data>
+	<data>
+		<platform>jumei</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://mall.jumei.com/.*</regx>
+	</data>
+	<data>
+		<platform>lefeng</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://product.lefeng.com/product/.*</regx>
+	</data>
+	<data>
+		<platform>womai</platform>
+		<pageType>PRODUCT</pageType>
+		<regx>(?:http|https)://www.womai.com/Product.*</regx>
+	</data>
+</datas>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

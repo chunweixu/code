@@ -1,0 +1,17 @@
+<xmlMatch>
+	<xmlStore>
+		<path>template/</path>
+	</xmlStore>
+    <xmlSelector>
+		<domain>item.jd.com,item.jd.hk</domain>
+		<file>jd.xml</file>
+	</xmlSelector>
+	<xmlSelector>
+		<domain>www.tmall.com</domain>
+		<file>tmall.xml</file>
+	</xmlSelector>
+	<xmlSelector>
+		<domain>www.dangdang.com</domain>
+		<file>dangdang.xml</file>  
+	</xmlSelector>  
+</xmlMatch>

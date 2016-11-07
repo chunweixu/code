@@ -1,0 +1,25 @@
+<syntun id = "tmall">
+    <domain>www.tmall.com</domain>
+    <method>xpath</method>
+    <selector id = "a">
+        <userName>
+            <type>text</type>
+            <name>userName</name>
+            <xpath>html body div[class=clearfix my-header] div[class=my-header-inner] div[class=my-info] div[class=user-info] h5[class=user-name]</xpath>
+            <regex></regex>
+        </userName>
+        <headIcon>
+            <type>img</type>
+            <name>head portrait</name>
+            <xpath>html body div[class=clearfix my-header] div[class=my-header-inner] div[class=my-info] div[class=user-avatar] img</xpath>
+            <regex></regex>
+        </headIcon>
+        <gender>
+            <type>text</type>
+            <name>gender</name>
+            <xpath>html body div[class=clearfix my-header] div[class=my-header-inner] div[class=my-info] div[class=user-info] p[class=user-meta]</xpath>
+            <regex></regex>
+        </gender>
+    </selector>
+    
+</syntun>

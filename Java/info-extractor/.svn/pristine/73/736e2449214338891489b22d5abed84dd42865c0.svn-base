@@ -1,0 +1,24 @@
+<infoExtractor>
+<rawpage>
+    <type>kafka</type>
+    <zookeeper>192.168.0.202:2181,192.168.0.203:2181,192.168.0.204:2181</zookeeper>
+    <topic>syntun_rawpage</topic>
+    <group>infoExtractor</group>
+</rawpage>
+
+<extractors>
+    <extractor name="PageType">
+        <rulefile></rulefile>
+    </extractor>
+    <extractor name="PageInfo">
+    </extractor>
+</extractors>
+
+<writers>
+    <writer type="hbase">
+        <table>pagebase</table>
+        <rule>etc/transRule.xml</rule>
+    </writer>
+</writers>
+
+</infoExtractor>

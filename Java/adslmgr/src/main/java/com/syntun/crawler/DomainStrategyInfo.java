@@ -1,0 +1,83 @@
+package com.syntun.crawler;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class DomainStrategyInfo {
+	private static Logger logger = LogManager.getLogger(DomainStrategyInfo.class.getName());
+	
+	//初始化域名配置信息
+	public static HashMap<String, InterfaceDomainInfo> init() {
+		
+		List<String> list = null;
+		if(CrawlerConfig.DOMAIN_CONFIG_PATH != null ){
+			list = DomainStrategyInfo.readFileByLines(CrawlerConfig.DOMAIN_CONFIG_PATH);
+		}
+		else{
+			list = new ArrayList<String>();
+		}
+		HashMap<String, InterfaceDomainInfo> mapDomainInfo = DomainStrategyInfo.domainStrategyInfo(list);
+		
+		return mapDomainInfo;
+	}
+	
+	//生成域名配置信息，存入HashMap中
+	private static HashMap<String, InterfaceDomainInfo> domainStrategyInfo(List<String> list) {
+		HashMap <String, InterfaceDomainInfo> mapDomainInfo = new HashMap <String, InterfaceDomainInfo>();
+		
+		for (String domainInfo : list) {
+			InterfaceDomainInfo interfaceDomainInfo = new InterfaceDomainInfo();
+			String[] str = domainInfo.split(",");//配置项之间用逗号分割
+			
+			if (str.length != 4) {
+				logger.debug("domainGrasping file format error!");
+				continue;
+			}
+			
+			String domain = str[0].toLowerCase();
+			interfaceDomainInfo.maxConn = Integer.parseInt(str[1]);
+			interfaceDomainInfo.stepTime = Long.parseLong(str[2]);
+			interfaceDomainInfo.MAX_ERROR_COUNT = Integer.parseInt(str[3]);
+			mapDomainInfo.put(domain, interfaceDomainInfo);
+		}
+		
+		return mapDomainInfo;
+	}
+	
+    //以行为单位读取文件,结果存入list集合中
+    private static List<String> readFileByLines(String fileName) {
+
+    	List<String> list = new ArrayList<String>();
+        File file = new File(fileName);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String domainInfo = null;
+     
+            // 一次读入一行，直到读入null为文件结束
+            while ((domainInfo = reader.readLine()) != null) {
+            	list.add(domainInfo);
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+        return list;
+    }
+}

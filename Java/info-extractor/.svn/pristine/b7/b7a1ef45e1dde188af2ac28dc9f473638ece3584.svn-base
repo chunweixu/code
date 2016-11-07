@@ -1,0 +1,128 @@
+package com.syntun.extractor;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+public class PageInfoResult {
+//	private static Logger logger = LogManager.getLogger(PageInfoResult.class.getName());
+//	PageInfoManager manager = new PageInfoManager();
+//	private int type;
+//	
+//	public List<Map<String, String>> extractPageInfo(String content, String baseUri) {
+//	    List<Selector> selectorList = parse(baseUri);
+//	    List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+//	    
+//	    if (selectorList == null) {
+//	    	return null;
+//	    }
+//	    try {
+//			if (type == 1) {
+//				JSONObject json = new JSONObject(content);
+//				for (Selector selector : selectorList) {
+//			    	Map<String, String> map = new HashMap<String, String>();
+//			    	for (ItemNode obj : selector.getNodes()) {
+//				    	map.put(obj.getName(), selectInfo(json, obj));
+//			    	}
+//			    	list.add(map);
+//			    }
+//				return list;
+//			} else {
+//			    //Document doc = Jsoup.connect(html).get();
+//			    Document doc = Jsoup.parse(content, baseUri);
+//			    for (Selector selector : selectorList) {
+//			    	Map<String, String> map = new HashMap<String, String>();
+//			    	for (ItemNode obj : selector.getNodes()) {
+//				    	map.put(obj.getName(), selectInfo(doc, obj));
+//			    	}
+//			    	list.add(map);
+//			    }
+//			    return list;
+//			}
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
+//	    
+//	private String selectInfo(Document doc, ItemNode node) {
+//	    if (node.getType().equals("text")) {
+//	    	Elements elements = doc.select(node.getXpath());
+//	    	String value = elements.text().trim();
+//	        if (!node.getPattern().equals(null)) {
+//	        	value = getToken(elements.text(), node.getPattern());
+//	        }
+//	        return value;
+//	    } else if (node.getType().equals("img")) {
+//	    	Elements elements = doc.select(node.getXpath() + "[src]");
+//	    	String value = elements.text().trim();
+//	    	if (!node.getPattern().equals(null)) {
+//	    		value = getToken(elements.attr("abs:src"), node.getPattern());
+//	        }
+//	    	return value;
+//	    } else {
+//	    	System.err.println("Unrecognize selector node: type");
+//	    	return null;
+//	    }
+//	}
+//	
+//	private String selectInfo(JSONObject json, ItemNode node) {
+//	    return null;
+//	}
+//	    
+//	private String getToken(String text, Pattern pattern) {
+//	    ArrayList<String> tokens = new ArrayList<String>();
+//		Matcher m = pattern.matcher(text);
+//		while (m.find()) {
+//			tokens.add(m.group());
+//		}
+//		return tokens.toString();
+//	}
+//	
+//	//根据url匹配相应模板
+//	private List<Selector> parse(String baseUri) {
+//		List<Selector> selectorList;
+//		String domain;
+//		try {
+//			domain = new URI(baseUri).getHost().toLowerCase();
+//			if (manager.getMap().containsKey(domain)) {
+//				String nodeType = manager.getMap().get(domain).getType();
+//				if (nodeType.equals("xpath")) {
+//					type = 0;
+//					selectorList = manager.getMap().get(domain).getSelectorList();
+//					return selectorList;
+//				}
+//				else if (nodeType.equals("json")) {
+//					type = 1;
+//					selectorList = manager.getMap().get(domain).getSelectorList();
+//					return selectorList;
+//				} else {
+//					System.err.println("Unrecognize template node: method");
+//					return null;
+//				}
+//			} else {
+//				logger.warn("Match template failure");
+//				return null;
+//			}
+//		} catch (URISyntaxException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+//		
+//	}
+}

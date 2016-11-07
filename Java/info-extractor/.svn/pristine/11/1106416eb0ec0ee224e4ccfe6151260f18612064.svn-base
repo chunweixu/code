@@ -1,0 +1,16 @@
+<syntun id = "dangdang">
+    <selector id = "a">
+        <biaoti>
+            <type>text</type>
+            <name>title</name>
+            <xpath>html head title</xpath>
+            <regex></regex>
+        </biaoti>
+        <price>
+            <type>text</type>
+            <name>price</name>
+            <xpath>html body[class=defwidth] section[class=detail] div[class=left] b span[id=main_price]</xpath>
+            <regex></regex>
+        </price>
+    </selector>
+</syntun>

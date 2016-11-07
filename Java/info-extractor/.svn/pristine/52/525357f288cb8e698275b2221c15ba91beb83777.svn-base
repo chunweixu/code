@@ -1,0 +1,84 @@
+package com.syntun.extractor;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.syntun.extractor.Selector.Node;
+
+public class WebInfoConfig { 
+	public List<Selector> parseXml(String fileName) {
+    	ArrayList<String> idList = new ArrayList<String>();
+    	ArrayList<Selector> list = new ArrayList<Selector>();
+    	Document m_configRoot = null;
+		try {
+			m_configRoot = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Elements idElements = m_configRoot.select("selector");
+		for (Element element : idElements) {
+			idList.add(element.attr("id"));
+		}
+		
+		for (String id : idList) {
+				
+			Elements elements = m_configRoot.getElementById(id).children();
+			Selector selector = new Selector();
+			selector.setSelectorId(id);
+			selector.setFileName(fileName);
+			for (Element element : elements) {
+				selector.addNode(parseX(element));
+			}
+			list.add(selector);
+		} 
+			
+    	return list;
+    }
+
+	private static Node parseX(Element element) {
+		Node node = new Selector().new Node();
+		node.setType(element.select("type").text());
+		node.setName(element.select("name").text());
+		node.setXpath(element.select("xpath").text());
+		node.setRegex(element.select("regex").text());
+		return node;
+	}
+	
+	public Map<String, String> getDomainsByXml(String fileName){
+		Map<String, String> map=new HashMap<String, String>();
+		Document m_configRoot = null;
+		try {
+			m_configRoot = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Elements idElements = m_configRoot.select("xmlSelector");
+		for (Element element : idElements) {
+			for (String domain : element.getElementsByTag("domain").text().trim().split(",")) {
+				map.put(domain, element.getElementsByTag("file").text().trim());
+			}
+		}
+		return map;
+	}
+	
+	public String getNodeValue(String fileName){
+		Document m_configRoot = null;
+		try {
+			m_configRoot = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Elements idElements = m_configRoot.select("xmlStore path");
+		return idElements.first().text().trim();
+	}
+	
+}

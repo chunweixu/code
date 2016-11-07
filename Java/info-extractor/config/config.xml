@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datas>
+	<!--<data>
+		<token_id>1</token_id>
+		<platform>亚马逊</platform>
+		<pageType>产品页</pageType>
+		<regx>.*jd.*</regx>
+		&lt;!&ndash;<status>1</status>&ndash;&gt;
+	</data>-->
+	<data>
+		<token_id>1</token_id>
+		<platform>jd</platform>
+		<pageType>ShopNews</pageType>
+		<regx>(?:http|https)://mall.jd.com/shopLevel-\d+.html</regx>
+		<!--<regx>http://mall.jd.com/shopLevel-\d+.html</regx>-->
+		<!--<status>1</status>-->
+	</data>
+	<data>
+		<token_id>2</token_id>
+		<platform>jd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://jprice.jd.com/adslogan/\d+-setproductadwords.ad</regx>
+
+	</data>
+	<data>
+		<token_id>3</token_id>
+		<platform>jd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://bank.market.360buy.com/bank/show_index.action\?callback=jsonp1371544260032._=1371544270985.sku=[a-zA-Z0-9]+.csId=[a-zA-Z0-9]+</regx>
+	</data>
+	<data>
+		<token_id>4</token_id>
+		<platform>jd</platform>
+		<pageType>Prices</pageType>
+		<regx>(?:http|https)://p.3.cn/prices/get?skuid=J_[a-zA-Z0-9]+.type=1.callback=changeImgPrice2Num</regx>
+	</data>
+	<data>
+		<token_id>5</token_id>
+		<platform>jd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://pi.3.cn/promoinfo/get\?id=[a-zA-Z0-9]+.callback=Promotions.set</regx>
+	</data>
+	<data>
+		<token_id>6</token_id>
+		<platform>jd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://bank.market.360buy.com/bank/show_index.action\?callback=jQuery8622809.sku=[a-zA-Z0-9]+.csId=880</regx>
+	</data>
+	<data>
+		<token_id>7</token_id>
+		<platform>jd</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://club.jd.com/review/[a-zA-Z0-9]+-0-1-0.html</regx>
+	</data>
+	<data>
+		<token_id>8</token_id>
+		<platform>jd</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://club.jd.com/review/[a-zA-Z0-9]+-0-\d+-0.html</regx>
+	</data>
+	<data>
+		<token_id>9</token_id>
+		<platform>tmall</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://rate.tmall.com/list_detail_rate.htm\?itemId=[a-zA-Z0-9]+.spuId=.sellerId=[a-zA-Z0-9]+.currentPage=1</regx>
+	</data>
+	<data>
+		<token_id>10</token_id>
+		<platform>tmall</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://rate.tmall.com/list_detail_rate.htm\?itemId=[a-zA-Z0-9]+.spuId=.sellerId=[a-zA-Z0-9]+.currentPage=\d+</regx>
+	</data>
+	<data>
+		<token_id>11</token_id>
+		<platform>tmall</platform>
+		<pageType>ShopNews</pageType>
+		<regx>(?:http|https)://rate.taobao.com/user-rate-[a-zA-Z0-9]+.htm</regx>
+	</data>
+	<data>
+		<token_id>12</token_id>
+		<platform>suning</platform>
+		<pageType>Prices</pageType>
+		<regx>(?:http|https)://www.suning.com/webapp/wcs/stores/ItemPrice/\d+_[a-zA-Z0-9]+_9017__1.html</regx>
+	</data>
+	<data>
+		<token_id>13</token_id>
+		<platform>suning</platform>
+		<pageType>Collar coupons Promotion</pageType>
+		<regx>(?:http|https)://www.suning.com/emall/snshowpromtag_10052_10051_31_9017_\d+_[a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9\.]+_processNewPromInfo_.html</regx>
+	</data>
+	<data>
+		<token_id>14</token_id>
+		<platform>suning</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://www.suning.com/emall/snsearchprom_10052_10051_1__9017_10_\d+_[a-zA-Z0-9]+_99.00_99.00__C_FourPage.showPromStatus_.html</regx>
+	</data>
+	<data>
+		<token_id>15</token_id>
+		<platform>suning</platform>
+		<pageType>PricesParameter</pageType>
+		<regx>(?:http|https)://www.suning.com/emall/psl_10052_10051_\d+_9017_10106_FourPage.showShopList_.html\?callback=FourPage.showShopList</regx>
+	</data>
+	<data>
+		<token_id>16</token_id>
+		<platform>suning</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://www.suning.com/ajax/review_lists/general-000000000[a-zA-Z0-9]+-[a-zA-Z0-9]+-total-\d+-default-10-----reviewList.htm</regx>
+	</data>
+	<data>
+		<token_id>17</token_id>
+		<platform>suning</platform>
+		<pageType>shop</pageType>
+		<regx>(?:http|https)://www.suning.com/ajax/getShopHeadInfo_[a-zA-Z0-9]+.html</regx>
+	</data>
+	<data>
+		<token_id>18</token_id>
+		<platform>gome</platform>
+		<pageType>Group promotion</pageType>
+		<regx>(?:http|https)://www.gome.com.cn/ec/homeus/n/product/browse/getProductLimitbuyAndGrouponJsonData.jsp\?callback=test.productId=[a-zA-Z0-9]+.skuId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>19</token_id>
+		<platform>gome</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://ss.gome.com.cn/ec/homeus/n/product/browse/getProductDetail.jsp?callback=cb_429990474367514.productId=[a-zA-Z0-9]+.skuId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>20</token_id>
+		<platform>gome</platform>
+		<pageType>PromotionPrices</pageType>
+		<regx>(?:http|https)://g.gome.com.cn/ec/homeus/browse/store.jsp?callback=jQuery17109253101195208728_1430879381234.goodsNo=\d+.city=11011400.areaId=110114001.siteId_p=.skuType_p=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>21</token_id>
+		<platform>gome</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://ss.gome.com.cn/ec/homeus/n/product/gadgets/prdevajsonp/appraiseModuleAjax.jsp\?callback=all.productId=[a-zA-Z0-9]+.pagenum=\d+</regx>
+	</data>
+	<data>
+		<token_id>22</token_id>
+		<platform>gome</platform>
+		<pageType>ShopNews</pageType>
+		<regx>(?:http|https)://mall.gome.com.cn/\d+</regx>
+	</data>
+	<data>
+		<token_id>23</token_id>
+		<platform>yixun</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://item.51buy.com/p/CGINewPromotion\?cids1=1009.cids2=1226.cids3=738.pid=\d+.whid=2001</regx>
+	</data>
+	<data>
+		<token_id>24</token_id>
+		<platform>yixun</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://pinglun.yixun.com/json1.php\?mod=reviews.act=getproperty.jsontype=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>25</token_id>
+		<platform>yixun</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://pinglun.yixun.com/json1.php\?mod=reviews.act=getreviews.jsontype=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>26</token_id>
+		<platform>yixun</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://d.dashou.yixun.com/dashou/querydashoudata\?whId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>27</token_id>
+		<platform>yhd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://busystock.i.yihaodian.com/restful/detail\?mcsite=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>28</token_id>
+		<platform>yhd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://item-home.yhd.com/item/ajax/ajaxProductPromotion.do\?callback=detailPromotion.reduceScrollbar.productID=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>29</token_id>
+		<platform>yhd</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://www.yihaodian.com/item/ajax/ajaxPmInfoExchangePoint.do?productMercantID=\d+</regx>
+	</data>
+	<data>
+		<token_id>30</token_id>
+		<platform>yhd</platform>
+		<pageType>Prices</pageType>
+		<regx>(?:http|https)://gps.yhd.com/restful/detail\?mcsite=1.provinceId=2.pmId=\d+</regx>
+	</data>
+	<data>
+		<token_id>31</token_id>
+		<platform>yhd</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://club.yhd.com/review/[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>32</token_id>
+		<platform>yhd</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://club.yhd.com/review/\d+-\d+</regx>
+	</data>
+	<data>
+		<token_id>33</token_id>
+		<platform>yhd</platform>
+		<pageType>ShopNews</pageType>
+		<regx>(?:http|https)://shop.yhd.com/interface/showDSRInfo.action\?jsonpCallback=storeJsonpMethods.callbackMethods.showMyDsr.merchantId=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>34</token_id>
+		<platform>yhd</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://shop.yhd.com/productExperience/proExperienceAction!ajaxView_pe.do\?product.id=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>35</token_id>
+		<platform>yhd</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://shop.yhd.com/productExperience/proExperienceAction!ajaxView_pe.do\?product.id=\d+.pagenationVO.currentPage=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>36</token_id>
+		<platform>dangdang</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://product.dangdang.com/comment/comment.php\?product_id=\d+.page=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>37</token_id>
+		<platform>dangdang</platform>
+		<pageType>ShopNews</pageType>
+		<regx>(?:http|https)://shop.dangdang.com/\d+\?act=evaluate.ref=shop-2-AC-03</regx>
+	</data>
+	<data>
+		<token_id>38</token_id>
+		<platform>amazon</platform>
+		<pageType>ShopSingleProductPage</pageType>
+		<regx>(?:http|https)://www.amazon.cn/dp/[a-zA-Z0-9]+/ref=lh_ni_t\?ie=UTF8.psc=1.smid=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>39</token_id>
+		<platform>amazon</platform>
+		<pageType>Promotion</pageType>
+		<regx>(?:http|https)://www.amazon.cn/dp/collect-coupon/handler/get_more_coupons.html\?asin=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>40</token_id>
+		<platform>amazon</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://www.amazon.cn/product-reviews/[a-zA-Z0-9]+/ref=cm_cr_pr_top_link_1\?ie=UTF8.showViewpoints=1.sortBy=bySubmissionDateDescending</regx>
+	</data>
+	<data>
+		<token_id>41</token_id>
+		<platform>amazon</platform>
+		<pageType>Comment</pageType>
+		<regx>(?:http|https)://www.amazon.cn/product-reviews/[a-zA-Z0-9]+/ref=cm_cr_pr_btm_link_next_0\?ie=UTF8.pageNumber=[\s\S]*?</regx>
+	</data>
+	<data>
+		<token_id>42</token_id>
+		<platform>amazon</platform>
+		<pageType>ShopNews</pageType>
+		<regx>(?:http|https)://www.amazon.cn/gp/aag/details/ref=aag_m_ss\?ie=UTF8.asin=B00BQ8RM1A.isAmazonFulfilled=0.isCBA=.marketplaceID=AAHKV2X7AFYLW.seller=[\s\S]*?</regx>
+	</data>
+</datas>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

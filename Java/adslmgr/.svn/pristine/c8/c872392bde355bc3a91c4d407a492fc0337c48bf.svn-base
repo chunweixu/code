@@ -1,0 +1,173 @@
+package com.syntun.crawler;
+
+
+import java.util.List;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Properties;
+
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+
+import gnu.getopt.Getopt;
+import kafka.javaapi.PartitionMetadata;
+
+
+public final class SyntunCrawler {
+	
+	public static Logger logger = null;
+	
+	public static int doTest(InetAddress addr){
+		
+		try{
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			HttpGet http = new HttpGet("http://1111.ip138.com/ic.asp");
+
+			RequestConfig config = RequestConfig.custom().setLocalAddress(addr).build();
+			http.setConfig(config);
+			http.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+			http.addHeader("Connection", "Keep-Alive");
+			http.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0");
+			System.out.println(http.getConfig().getLocalAddress().toString());
+			
+			ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+                public String handleResponse(
+                        HttpResponse response) throws ClientProtocolException, IOException {
+                    int status = response.getStatusLine().getStatusCode();
+                    if (status >= 200 && status < 300) {
+                        HttpEntity entity = response.getEntity();
+                        return entity != null ? EntityUtils.toString(entity) : null;
+                    } else {
+                        throw new ClientProtocolException("Unexpected response status: " + status);
+                    }
+                }
+            };
+            
+            String responseBody = httpclient.execute(http, responseHandler);
+            System.out.println("----------------------------------------");
+            System.out.println(responseBody);
+            httpclient.close();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally{
+			
+		}
+
+		
+		return 0;
+	}
+	
+	public static void initLogger(String logConfig){
+		ConfigurationSource source; 
+
+		try {
+			source = new ConfigurationSource(new FileInputStream(logConfig));
+			Configurator.initialize(null, source);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally{
+			logger = LogManager.getLogger(SyntunCrawler.class.getName());
+		}
+	}
+	
+	public static void printUsage(){
+		System.out.println("Usage:");
+		System.out.println("\tscrawler -c [crawler_config] -l [log_config]");
+		System.out.println("");
+	}
+	
+
+	
+	public static void main(String[] args )
+    {
+
+		Getopt getOpt = new Getopt("scrawler",args,"c:l:");
+		int c = 0;
+		String logConfig = null;
+		String crawlerConfig = null;
+		while((c=getOpt.getopt())!= -1){
+			switch(c){
+			case 'c':
+				crawlerConfig = getOpt.getOptarg();
+				break;
+			case 'l':
+				logConfig = getOpt.getOptarg();
+				break;
+			default:
+				System.out.println("Invalid option - " + c);
+				printUsage();
+				System.exit(-1);
+				return;
+			}
+		}
+		
+		if(logConfig == null || crawlerConfig == null){
+			printUsage();
+			System.exit(-1);
+			return;
+		}
+		
+		initLogger(logConfig);
+		
+		CrawlerConfig.parseConfig(crawlerConfig);
+
+		RequestManager reqMgr = new RequestManager();
+		reqMgr.init();
+		
+		PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager();
+		connMgr.setMaxTotal(2048);
+		connMgr.setDefaultMaxPerRoute(32);
+		int threadNum = CrawlerConfig.FETCHER_THREAD_NUMBER;
+		ArrayList<FetcherThread> listFetcher = new ArrayList<FetcherThread>();
+		for (int i = 0; i < threadNum; ++i) {
+			listFetcher.add(new FetcherThread());
+			listFetcher.get(i).setRequestManager(reqMgr);
+			listFetcher.get(i).setConnMgr(connMgr);
+			listFetcher.get(i).start();
+		}
+		
+		while (true) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				break;
+			}		
+		}
+				
+		System.exit(0);
+    }
+}

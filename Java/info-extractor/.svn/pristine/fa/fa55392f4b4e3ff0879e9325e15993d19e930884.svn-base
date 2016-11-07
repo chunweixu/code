@@ -1,0 +1,60 @@
+package com.syntun.extractor;
+
+import java.util.List;
+
+import org.json.JSONObject;
+
+import com.syntun.util.RawPageCompress;
+
+public class PageInfo implements Extractor {
+	PageInfoManager pageInfo = new PageInfoManager();
+	
+	public boolean init(InfoExtractorConfig config) {
+		try {
+			boolean flag = pageInfo.load(config.getExtractorConfig("PageInfo").get("templatepath"));
+			if (!flag) {
+				System.err.println("load templatepath failure");
+				return false;
+			} 
+			return true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean run(JSONObject ctxt) {
+		String baseUri = ctxt.getJSONObject("rawpage").getString("url");
+		String encoding = ctxt.getJSONObject("rawpage").getString("http_content_encoding");
+		String compressCon = ctxt.getJSONObject("rawpage").getString("http_content");
+		if (encoding.equals("gzip")) {
+			String html = RawPageCompress.Uncompress(compressCon);
+			List<Selector> result = pageInfo.extractPageInfo(html, baseUri);
+			for (Selector selector : result) {
+				for (ItemNode node : selector.getNodes()) {
+					if (node.getNodeParseValue().isEmpty()) {
+						continue;
+				    } else {
+					    ctxt.put(node.getName(), node.getNodeParseValue());
+				    }
+			    }  
+		    }
+		} else {
+			System.err.println("Unrecognize compress type");
+			return false;
+		}
+		return true;
+	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

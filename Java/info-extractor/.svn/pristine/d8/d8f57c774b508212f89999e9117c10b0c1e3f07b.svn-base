@@ -1,0 +1,107 @@
+package com.syntun.extractor;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.syntun.extractor.Selector.Node;
+
+public class WebInfoTemplate {
+    private List<String> domain = null;
+    private String type = null ;
+    private List<Selector> selectorList = null;
+    private static List<WebInfoTemplate> templateList = new ArrayList<WebInfoTemplate>();
+    
+    public static List<WebInfoTemplate> getTemplateList() {
+		return templateList;
+	}
+	public List<String> getDomain() {
+		return domain;
+	}
+	public String getType() {
+		return type;
+	}
+	public List<Selector> getSelectorList() {
+		return selectorList;
+	}
+	
+	public static boolean load(String tempDir) {
+		File dir = new File(tempDir);
+		for (File file : dir.listFiles()) {
+			WebInfoTemplate templateInfo = new WebInfoTemplate();
+			List<String> domainList = new ArrayList<String>();
+			Document doc;
+			try {
+				doc = Jsoup.parse(file, "utf-8");
+				Elements elements1 = doc.getElementsByTag("domain");
+				if (elements1.size() != 1) {
+					System.err.println("Invalid config node: domain");
+					return false;
+				}
+				Element domain = elements1.get(0);
+				String[] str = domain.text().trim().split(",");
+				for (int i=0; i<str.length; i++) {
+					domainList.add(str[i]);
+				}
+				templateInfo.domain = domainList;
+					
+				Elements elements2 = doc.getElementsByTag("method");
+				if (elements2.size() != 1) {
+					System.err.println("Invalid config node: method");
+					return false;
+				}
+                templateInfo.type = elements2.get(0).text();;
+                
+                templateInfo.selectorList = parseXml(file.toString());
+				
+                templateList.add(templateInfo);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+			}
+			return true;
+    }
+    
+	private static List<Selector> parseXml(String fileName) {
+    	ArrayList<Selector> list = new ArrayList<Selector>();
+    	Document m_configRoot = null;
+		try {
+			m_configRoot = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (Exception e1) {
+			System.err.println("parse file error");
+			e1.printStackTrace();
+		}
+		Elements elements = m_configRoot.getElementsByTag("selector");
+		for (Element element : elements) {
+			Selector selector = new Selector();
+			selector.setSelectorId(element.attr("id"));
+			for (Element element1 : element.children()) {
+				selector.addNode(parseNode(element1));
+			}
+			list.add(selector);
+		}
+    	return list;
+    }
+
+	private static Node parseNode(Element element) {
+		Node node = new Selector().new Node();
+		node.setType(element.select("type").text());
+		node.setName(element.select("name").text());
+		node.setXpath(element.select("xpath").text());
+		node.setRegex(element.select("regex").text());
+		return node;
+	}
+	@Override
+	public String toString() {
+		return "WebInfoTemplate [domain=" + domain + ", type=" + type
+				+ ", selectorList=" + selectorList + "]";
+	}
+	
+}

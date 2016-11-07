@@ -1,0 +1,119 @@
+package com.syntun.extractor;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.syntun.extractor.Selector.Node;
+
+public class WebInfoTemplate {
+    private List<Selector> selectorList = null;
+    private String[] domains = null;
+    private String type = null;
+
+    public List<Selector> getSelectorList() {
+		return selectorList;
+	}
+
+	public String[] getDomains() {
+		return domains;
+	}
+
+	public String getType() {
+		return type;
+	}
+	
+	private boolean parseSelector(Document root) {
+		selectorList = new ArrayList<Selector>();
+		Elements elements = root.getElementsByTag("selector");
+		for (Element element : elements) {
+			Selector selector = new Selector();
+			selector.setSelectorId(element.attr("id"));
+			for (Element element1 : element.children()) {
+				selector.addNode(parseNode(element1));
+			}
+			selectorList.add(selector);
+		}
+		return true;
+	}
+	
+	private boolean parseDomains(Document root) {
+		Elements elements = root.getElementsByTag("domain");
+		if (elements.size() != 1) {
+			System.err.println("Invalid config node: domain");
+			return false;
+		}
+		domains = elements.get(0).text().trim().split(",");
+		return true;
+	}
+	
+	private boolean parseType(Document root) {
+		Elements elements = root.getElementsByTag("method");
+		if (elements.size() != 1) {
+			System.err.println("Invalid config node: method");
+			return false;
+		}
+		type = elements.get(0).text().trim();
+		return true;
+	}
+	
+	public boolean initTemplate(String fileName) {
+		Document root = null;
+		try {
+			root = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		if (!parseSelector(root)) {
+			return false;
+		}
+		if (!parseDomains(root)) {
+			return false;
+		}
+		if (!parseType(root)) {
+			return false;
+		}
+		return true;
+	}
+
+	private Node parseNode(Element element) {
+		Node node = new Selector().new Node();
+		try {
+			node.setType(element.select("type").text());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node.setName(element.select("name").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setXpath(element.select("xpath").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			String pattern = element.select("regex").text().trim();
+			if (pattern.equals("")) {
+				node.setPattern(null);
+			} else {
+				Pattern tokSplitter = Pattern.compile(pattern);
+				node.setPattern(tokSplitter);
+			};
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return node;
+	}
+}

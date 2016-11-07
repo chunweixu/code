@@ -1,0 +1,43 @@
+package com.syntun.extractor;
+
+import java.util.List;
+
+import org.json.JSONObject;
+
+import com.syntun.extractor.Selector.Node;
+
+public class PageInfo implements Extractor {
+
+	public boolean init(InfoExtractorConfig config) {
+		
+		return true;
+	}
+
+	public boolean run(JSONObject ctxt) {
+		String baseUri = ctxt.getJSONObject("rawpage").getString("url");
+		String html = ctxt.getJSONObject("rawpage").getString("http_content");
+		PageInfoManager pageInfo = new PageInfoManager();
+		List<Selector> result = pageInfo.extractPageInfo(html, baseUri);
+		for (Selector selector : result) {
+			for (Node node : selector.getNodes()) {
+				if (node.getNodeParseValue().isEmpty()) {
+					continue;
+			    } else {
+				    ctxt.put(node.getName(), node.getNodeParseValue());
+			    }
+		    }  
+	    }	
+		return true;
+	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

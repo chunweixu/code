@@ -1,0 +1,117 @@
+package com.syntun.crawler;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class FutureManager {
+	
+	private static Logger logger = LogManager.getLogger(FutureManager.class.getName());
+	
+	private int run_time_period=10*1000;   //执行间隔时间
+	private String topic;
+	private ZookeeperUtil zu=null;
+	private List<Future<RecordMetadata>> future_list=new ArrayList<Future<RecordMetadata>>();
+
+//	private CompletionService<RecordMetadata> cs=new CompletionService(){...};
+	
+	public FutureManager(String topic) {
+		this.topic=topic;
+		this.zu = new ZookeeperUtil(topic, 0);
+		startManager();
+	}
+	
+	public void addData(Future<RecordMetadata> future){
+		synchronized(future_list){
+			future_list.add(future);
+		}
+	}
+	public void work() throws InterruptedException, ExecutionException{
+		
+		List<Future<RecordMetadata>> success_list=new ArrayList<Future<RecordMetadata>>();
+		synchronized(future_list){
+			if(future_list.size()==0){
+				return;
+			}
+			for (Future<RecordMetadata> future : future_list) {
+				if(future.isDone()){
+					success_list.add(future);
+					//System.out.println(future.get().offset());
+				}
+			}
+		
+			future_list.removeAll(success_list);
+		}
+		Map<Integer, Long> mapMax = maxOffset(success_list);
+		for (Entry<Integer, Long>  entry  : mapMax.entrySet()) {
+			zu.rebuild(topic, entry.getKey());
+			zu.writeOffset(entry.getValue());
+		}
+		//logger.debug("write ====="+topic+"   "+maxOffset(success_list));
+		success_list.clear();
+	}
+	
+	public void startManager(){
+		TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+            	logger.debug("rawpage Watcher runing....");
+            	try {
+					work();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(task,0, run_time_period);
+	}
+	
+	private Map<Integer, Long> maxOffset(List<Future<RecordMetadata>> success_list){
+		
+		Map<Integer, Long> mapMax= new HashMap<Integer,Long>();
+		for (Future<RecordMetadata> future : success_list) {
+			Long offset = null;
+			Integer part = null;
+			try {
+				offset = future.get().offset();
+				part = future.get().partition();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
+			
+			if(!mapMax.containsKey(part)){
+				mapMax.put(part, offset);
+			}
+			else{
+				if(offset > mapMax.get(part)){
+					mapMax.put(part, offset);
+				}
+			}
+		}
+		return mapMax;
+	}
+	
+}

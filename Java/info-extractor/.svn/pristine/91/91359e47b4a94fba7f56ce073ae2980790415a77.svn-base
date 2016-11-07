@@ -1,0 +1,55 @@
+package com.syntun.extractor;
+
+import java.util.List;
+
+import org.json.JSONObject;
+
+import com.syntun.extractor.XpathSelector.Node;
+import com.syntun.util.RawPageCompress;
+
+public class PageInfo implements Extractor {
+	PageInfoManager pageInfo = new PageInfoManager();
+	public boolean init(InfoExtractorConfig config) {
+		if (pageInfo.load(config.getExtractorConfig("PageInfo").get("templatepath"))) {
+		    return true;
+		} else {
+			System.err.println("load templatepath failure");
+			return false;
+		}
+	}
+
+	public boolean run(JSONObject ctxt) {
+		String baseUri = ctxt.getJSONObject("rawpage").getString("url");
+		String compressCon = ctxt.getJSONObject("rawpage").getString("http_content");
+		String html;
+		try {
+			html = RawPageCompress.Uncompress(compressCon);
+			List<XpathSelector> result = pageInfo.extractPageInfo(html, baseUri);
+			for (XpathSelector selector : result) {
+				for (Node node : selector.getNodes()) {
+					if (node.getNodeParseValue().isEmpty()) {
+						continue;
+				    } else {
+					    ctxt.put(node.getName(), node.getNodeParseValue());
+				    }
+			    }  
+		    }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

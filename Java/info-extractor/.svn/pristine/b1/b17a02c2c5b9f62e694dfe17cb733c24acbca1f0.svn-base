@@ -1,0 +1,82 @@
+package com.syntun.extractor;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class Selector {
+	private String selectorId;
+	private Set<Node> nodes;
+	
+	@Override
+	public String toString() {
+		return "Selector [selectorId=" + selectorId + ", nodes=" + nodes + "]";
+	}
+
+	public String getSelectorId() {
+		return selectorId;
+	}
+
+	public void setSelectorId(String selectorId) {
+		this.selectorId = selectorId;
+	}
+
+	public Set<Node> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(Set<Node> nodes) {
+		this.nodes = nodes;
+	}
+	
+	public void addNode(Node node) {
+		if (this.nodes == null) {
+			this.nodes = new HashSet<Node>();
+		}
+		this.nodes.add(node);
+	}
+
+	public class Node{
+		private String type;
+		private String name;
+		private String xpath;
+		private String regex;
+		private String nodeParseValue;
+		public String getNodeParseValue() {
+			return nodeParseValue;
+		}
+		public void setNodeParseValue(String nodeParseValue) {
+			this.nodeParseValue = nodeParseValue;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getXpath() {
+			return xpath;
+		}
+		public void setXpath(String xpath) {
+			this.xpath = xpath;
+		}
+		public String getRegex() {
+			return regex;
+		}
+		public void setRegex(String regex) {
+			this.regex = regex;
+		}
+		@Override
+		public String toString() {
+			return "Node [type=" + type + ", name=" + name + ", xpath=" + xpath
+					+ ", regex=" + regex + ", nodeParseValue=" + nodeParseValue
+					+ "]";
+		}
+		
+	}
+}	

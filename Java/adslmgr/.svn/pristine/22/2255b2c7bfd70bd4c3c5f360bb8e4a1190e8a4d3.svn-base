@@ -1,0 +1,246 @@
+package com.syntun.crawler;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import kafka.javaapi.consumer.SimpleConsumer;
+import kafka.message.MessageAndOffset;
+import kafka.api.FetchRequest;
+import kafka.api.FetchRequestBuilder;
+import kafka.api.PartitionOffsetRequestInfo;
+import kafka.common.ErrorMapping;
+import kafka.common.TopicAndPartition;
+import kafka.javaapi.FetchResponse;
+import kafka.javaapi.OffsetResponse;
+import kafka.javaapi.PartitionMetadata;
+import kafka.javaapi.TopicMetadata;
+import kafka.javaapi.TopicMetadataRequest;
+
+public class UrlSelectConsumer {
+	
+	private static Logger logger = LogManager.getLogger(FetcherThread.class.getName());
+	
+	private List<String> m_replicaBrokers = new ArrayList<String>();//Broker列表
+	
+	private SimpleConsumer m_consumer = null;
+	
+	private String m_clientName = null;
+	
+	private String m_topic = null;
+	
+	private long m_offset = -1;
+	
+	private int m_port = 0;
+	
+	private int m_partition = 0;
+	
+	private static int m_timeOut = 100000;
+	
+	private static int m_bufferSize = (2*1024*1024);
+
+	private static int m_maxRetries = 5;
+	
+	private String m_leadBroker;
+	
+	private ZookeeperUtil zu;
+	
+	public boolean init(List<String> seedBrokers, int port, String topic, int partition) {
+		PartitionMetadata metaData = findLeader(seedBrokers, port, topic, partition);
+		if (metaData == null || metaData.leader() == null) {
+			return false;
+		}
+		m_leadBroker = metaData.leader().host();
+		m_clientName = "URLSELECT_CLIENT_" + topic + "_" + partition;
+		m_topic = topic;
+		m_port = port;
+		m_partition = partition;
+		
+		m_consumer = new SimpleConsumer(m_leadBroker, port, m_timeOut, m_bufferSize, m_clientName);
+		
+		m_offset = UrlSelectConsumer.getLastOffset(m_consumer, topic, partition, kafka.api.OffsetRequest.EarliestTime(), m_clientName);
+		zu = new ZookeeperUtil(m_topic, m_partition);
+		Long offset = zu.getDataOffset();
+		if (offset > 0) {
+			m_offset = offset;
+		}
+		return true;
+	}
+	
+	/*
+	 * 返回： null 错误，需要重连
+	 * 		not null 结果，可能为空
+	 */
+	public List<JSONObject> getDataFromKafka() {
+		
+		FetchRequest req = null;
+		FetchResponse fetchResponse = null;
+		int retries = 0;
+
+		while (true) {
+			if (m_consumer == null) {
+				m_consumer = new SimpleConsumer(m_leadBroker, m_port, 100000, 1024 * 1024, m_clientName);
+			}
+			req = new FetchRequestBuilder().clientId(m_clientName).addFetch(m_topic, m_partition, m_offset, m_bufferSize).build();
+			fetchResponse = m_consumer.fetch(req);
+			if(fetchResponse.hasError()){
+				retries++;
+				short code = fetchResponse.errorCode(m_topic, m_partition);
+				logger.error("Error fetching data from the Broker:" + m_leadBroker + " Reason: " + code);
+				if(retries >= m_maxRetries){
+					return null;
+				}
+				if (code == ErrorMapping.OffsetOutOfRangeCode())  {
+					m_offset = getLastOffset(m_consumer,m_topic,m_partition, kafka.api.OffsetRequest.LatestTime(), m_clientName);
+					continue;
+				}
+				m_consumer.close();
+				m_consumer = null;
+				try {
+					m_leadBroker = findNewLeader(m_leadBroker, m_topic, m_partition, m_port);
+				} catch (Exception e) {
+					logger.error("Can not get kafka leader. Wait for 10 seconds.");
+					try {
+						Thread.sleep(60000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}
+			}
+			break;
+		}
+		
+		long numRead = 0;
+		List<JSONObject> result = new ArrayList<JSONObject>();
+		if(m_offset >= 0){
+			zu.writeOffset(m_offset);
+			//logger.debug("topic:"+m_topic+"   m_partition:"+m_partition +"  write:"+m_offset);
+		}		
+		for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(m_topic, m_partition)) {
+			long currentOffset = messageAndOffset.offset();
+			if (currentOffset < m_offset) {
+				System.out.println("Found an old offset: " + currentOffset + " Expecting: " + m_offset);
+				continue;
+			}
+			
+			m_offset = messageAndOffset.nextOffset();
+			ByteBuffer payload = messageAndOffset.message().payload();
+			byte[] bytes = new byte[payload.limit()];
+			payload.get(bytes);
+			try {
+				//System.out.println(String.valueOf(messageAndOffset.offset()) + ": " + new String(bytes, "UTF-8"));
+				String pl = new String(bytes, "UTF-8");
+				if(pl.startsWith("[")){
+					JSONArray jsonArray = new JSONArray(new String(bytes, "UTF-8"));
+					result.add(jsonArray.getJSONObject(0));
+				}
+				else{
+					result.add(new JSONObject(new String(bytes, "UTF-8")));
+				}
+		
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+			numRead++;
+		}
+		
+		//System.out.println("MessageCount:" + numRead);
+		
+		return result;
+	}
+	
+	public PartitionMetadata findLeader(List<String> a_seedBrokers, int a_port, String a_topic, int a_partition){ //
+		PartitionMetadata returnMetaData = null;
+        loop:
+        for (String seed : a_seedBrokers) {
+            SimpleConsumer consumer = null;
+            try {
+                consumer = new SimpleConsumer(seed, a_port, 100000, 64 * 1024, "leaderLookup");
+                List<String> topics = Collections.singletonList(a_topic);
+                TopicMetadataRequest req = new TopicMetadataRequest(topics);
+                kafka.javaapi.TopicMetadataResponse resp = consumer.send(req);
+ 
+                List<TopicMetadata> metaData = resp.topicsMetadata();
+ 
+                for (TopicMetadata item : metaData) {
+                    for (PartitionMetadata part : item.partitionsMetadata()) {
+                        if (part.partitionId() == a_partition) {
+                            returnMetaData = part;
+                            break loop;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error communicating with Broker [" + seed + "] to find Leader for [" + a_topic
+                        + ", " + a_partition + "] Reason: " + e);
+            } finally {
+                if (consumer != null) consumer.close();
+            }
+        }
+        if (returnMetaData != null) {
+            m_replicaBrokers.clear();
+            for (kafka.cluster.Broker replica : returnMetaData.replicas()) {
+                m_replicaBrokers.add(replica.host());
+            }
+        }
+        return returnMetaData;
+	}
+	
+	public static long getLastOffset(SimpleConsumer consumer, String topic, int partition,
+			long whichTime, String clientName) {
+		
+		TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partition);
+		Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
+		requestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(whichTime, 1));
+		kafka.javaapi.OffsetRequest request = new kafka.javaapi.OffsetRequest(requestInfo, kafka.api.OffsetRequest.CurrentVersion(),clientName);
+		OffsetResponse response = consumer.getOffsetsBefore(request);
+
+		if (response.hasError()) {
+			System.out.println("Error fetching data Offset Data the Broker. Reason: " + response.errorCode(topic, partition) );
+			return 0;
+		}
+		long[] offsets = response.offsets(topic, partition);
+		return offsets[0];
+	}
+
+	private String findNewLeader(String a_oldLeader, String a_topic, int a_partition, int a_port) throws Exception {
+		for (int i = 0; i < 3; i++) {
+			boolean goToSleep = false;
+			PartitionMetadata metadata = findLeader(m_replicaBrokers, a_port, a_topic, a_partition);
+			if (metadata == null) {
+				goToSleep = true;
+			} else if (metadata.leader() == null) {
+				goToSleep = true;
+			} else if (a_oldLeader.equalsIgnoreCase(metadata.leader().host()) && i == 0) {
+				// first time through if the leader hasn't changed give ZooKeeper a second to recover
+				// second time, assume the broker did recover before failover, or it was a non-Broker issue
+				//
+				goToSleep = true;
+			} else {
+				return metadata.leader().host();
+			}
+			if (goToSleep) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException ie) {
+				}
+			}
+		}
+		logger.error("Unable to find new leader after Broker failure. Exiting");
+		throw new Exception("Unable to find new leader after Broker failure. Exiting");
+	}
+}

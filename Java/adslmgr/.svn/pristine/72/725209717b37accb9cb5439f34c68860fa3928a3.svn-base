@@ -1,0 +1,37 @@
+<syntun>
+    <crawler>
+        <connection>
+            <socketTimeout>10000</socketTimeout>
+            <connectTimeout>10000</connectTimeout>
+            <fetcherThreadNum>1</fetcherThreadNum>
+        </connection>
+        <interfaces>
+            <!--interface>
+                <localIp>192.168.103.1</localIp>
+                <name>ppp0</name>
+            </interface>
+            <interface>
+                <localIp>192.168.102.1</localIp>
+                <name>ppp1</name>
+            </interface-->
+        </interfaces>
+        <kafka>
+            <broker>192.168.0.250</broker>
+            <broker>192.168.0.250</broker>
+            <port>9092</port>
+        </kafka>
+        <urlSelector>
+            <topic>urlselect</topic>
+            <partition>0</partition>
+            <zookeeper>192.168.0.250:2181</zookeeper>
+        </urlSelector>
+        <rawPage>
+            <topic>rawpage</topic>
+            <clientName>RAW_PAGE_PRODUCER_0</clientName>
+        </rawPage>
+        <!-- 域名抓取策略文件配置信息 -->
+        <domainInfo>
+            <path>conf/domainGrasping.txt</path>
+        </domainInfo>
+    </crawler>
+</syntun>

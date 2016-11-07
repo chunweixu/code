@@ -1,0 +1,26 @@
+package com.syntun.crawler;
+
+import java.util.HashMap;
+
+public class UrlUniq {
+	private HashMap<String, Long> uniqMap = new HashMap<String, Long>(33554432);
+	private long step=(2*3600*1000); //2小时间隔
+	
+	public boolean needCrawl(String url){
+		Long curTime = System.currentTimeMillis();
+		Long lastTime = uniqMap.get(url);
+		if(lastTime == null){
+			uniqMap.put(url, curTime);
+			return true;
+		}
+		else{
+			if(lastTime + step > curTime){ //还没到时间，不需要抓
+				return false;
+			}
+			else{
+				uniqMap.put(url, curTime);
+				return true;
+			}
+		}
+	}
+}

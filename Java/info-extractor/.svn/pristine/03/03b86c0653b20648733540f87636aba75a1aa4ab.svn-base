@@ -1,0 +1,145 @@
+package com.syntun.extractor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.nodes.Element;
+
+public class JsonSelector implements Selector {
+	private static Logger logger = LogManager.getLogger(JsonSelector.class.getName());
+	private String selectorId;
+	private Set<ItemNode> nodes;
+	
+	@Override
+	public String toString() {
+		return "Selector [selectorId=" + selectorId + ", nodes=" + nodes + "]";
+	}
+
+	public String getSelectorId() {
+		return selectorId;
+	}
+
+	public Set<ItemNode> getNodes() {
+		return nodes;
+	}
+
+	public boolean initSelector(Element element) {
+		try {
+			selectorId = element.attr("id");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.warn("Lack of attribute id");
+			return false;
+		}
+		try {
+			for (Element element1 : element.children()) {
+				if (this.nodes == null) {
+					this.nodes = new HashSet<ItemNode>();
+				}
+				nodes.add(parseNode(element1));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	private ItemNode parseNode(Element element) {
+		ItemNode node = new ItemNode();
+		try {
+			node.setType(element.select("type").text().trim());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node.setName(element.select("name").text().trim());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setJsonPath(element.select("jsonPath").text().trim());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			String pattern = element.select("regex").text().trim();
+			if (pattern.equals("")) {
+				node.setPattern(null);
+			} else {
+				Pattern tokSplitter = Pattern.compile(pattern);
+				node.setPattern(tokSplitter);
+			};
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return node;
+	}
+
+	public Map<String, String> extractSelectorInfo(String content, String baseUri) {
+		// TODO Auto-generated method stub
+		try {
+			JSONObject json = new JSONObject(content);//JSONException
+			Map<String, String> map = new HashMap<String, String>();
+			for (ItemNode obj : nodes) {
+				if (!selectInfo(json, obj).equals(null)) {
+			        map.put(obj.getName(), selectInfo(json, obj));
+				}
+			}
+			if (map.isEmpty()) {
+		    	logger.warn("Extract selector nothing: " + selectorId);
+		    	return null;
+		    } else {
+		        return map;
+		    }
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private String selectInfo(JSONObject json, ItemNode node) {
+		try {
+			if (node.getType().equals("text")) {
+				String value = JSONHelper.getJsonString(json, node.getJsonPath());
+				if (value == null) {
+					return null;
+				}
+				if (!node.getPattern().equals(null)) {
+				    value = getToken(value, node.getPattern());
+				}
+				return value;
+			} else {
+				logger.warn("Unrecognize selector node: type");
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+		    
+	private String getToken(String text, Pattern pattern) {
+		ArrayList<String> tokens = new ArrayList<String>();
+	    Matcher m = pattern.matcher(text);
+		while (m.find()) {
+			tokens.add(m.group());
+		}
+		return tokens.toString();	
+	}
+}

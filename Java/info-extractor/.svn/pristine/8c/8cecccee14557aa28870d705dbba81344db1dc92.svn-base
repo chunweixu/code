@@ -1,0 +1,37 @@
+package com.syntun.extractor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
+public class ExtractorManager {
+	private List<Extractor> listExtractor = new ArrayList<Extractor>();
+	private static Logger logger = LogManager.getLogger(ExtractorManager.class.getName());
+	
+	public boolean registerExtractor(Extractor extractor){
+		listExtractor.add(extractor);
+		return true;
+	}
+	
+	public boolean run(JSONObject ctxt){
+		for(Extractor e: listExtractor){
+			logger.info("Calling:" + e.getName());
+			if(!e.run(ctxt)){
+				logger.warn(String.format("Extractor run failed. name:%s",e.getName()));
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean destroy(){
+		for(Extractor e: listExtractor){
+			e.close();
+		}
+		listExtractor.clear();
+		return true;
+	}
+}

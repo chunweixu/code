@@ -1,0 +1,127 @@
+package com.syntun.extractor;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+public class XpathSelector extends Selector {
+	private String selectorId;
+	private Set<Node> nodes;
+	
+	@Override
+	public String toString() {
+		return "Selector [selectorId=" + selectorId + ", nodes=" + nodes + "]";
+	}
+
+	public String getSelectorId() {
+		return selectorId;
+	}
+
+	public Set<Node> getNodes() {
+		return nodes;
+	}
+
+	public boolean initSelector(Element element) {
+		try {
+			selectorId = element.attr("id");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.err.println("Lack of attribute id");
+			return false;
+		}
+		try {
+			for (Element element1 : element.children()) {
+				if (this.nodes == null) {
+					this.nodes = new HashSet<Node>();
+				}
+				nodes.add(parseNode(element1));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	private Node parseNode(Element element) {
+		Node node = new Node();
+		try {
+			node.setType(element.select("type").text());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node.setName(element.select("name").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setXpath(element.select("xpath").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			String pattern = element.select("regex").text().trim();
+			if (pattern.equals("")) {
+				node.setPattern(null);
+			} else {
+				Pattern tokSplitter = Pattern.compile(pattern);
+				node.setPattern(tokSplitter);
+			};
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return node;
+	}
+	
+	public class Node {
+		private String type;
+		private String name;
+		private String xpath;
+		private Pattern pattern;
+		private String nodeParseValue;
+		public Pattern getPattern() {
+			return pattern;
+		}
+		public void setPattern(Pattern pattern) {
+			this.pattern = pattern;
+		}
+		public String getNodeParseValue() {
+			return nodeParseValue;
+		}
+		public void setNodeParseValue(String nodeParseValue) {
+			this.nodeParseValue = nodeParseValue;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getXpath() {
+			return xpath;
+		}
+		public void setXpath(String xpath) {
+			this.xpath = xpath;
+		}
+		@Override
+		public String toString() {
+			return "Node [type=" + type + ", name=" + name + ", xpath=" + xpath
+					+ ", pattern=" + pattern
+					+ ", nodeParseValue=" + nodeParseValue + "]";
+		}
+	}
+}	

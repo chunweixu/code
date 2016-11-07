@@ -1,0 +1,44 @@
+<syntun id = "jd">
+    <!-- 不同的域名用逗号隔开 -->   
+    <domain>item.jd.com,item.jd.hk</domain>
+    <!-- mehtod只有xpath或者json -->
+    <method>xpath</method>
+    <!-- 每一selector对应一个模板类型，每一模板类型通过id区别且含有多个item属性 -->
+    <selectors>
+	<selector id = "test">
+	    <!-- 每一item对应一个属性，type为解析info的类型，method为xpath有text、img和html，method为json有text，name为属性名，如价格属性可以为price，
+	    xpath，或者jsonpath对应解析路径，前者对应method为xpath，后者对应json，regex为正则表达式-->
+        <item>
+            <type>text</type>
+            <name>title</name>
+            <xpath>div[id=itemInfo] div[id=name] h1</xpath>
+            <regex></regex>
+        </item>
+        <item>
+            <type>html</type>
+            <name>skuid</name>
+            <xpath>head script</xpath>
+            <regex>pageConfig([\\s\\S]*)(};+?)</regex>
+        </item>
+        <item>
+            <type>text</type>
+            <name>category</name>
+            <xpath>div[id=root-nav] div[class=w] div[class=breadcrumb]</xpath>
+            <regex></regex>
+        </item>
+        <item>
+            <type>html</type>
+            <name>detailTabParam</name>
+            <xpath>div[id=product-detail-2] table[class=Ptable] tbody</xpath>
+            <regex></regex>
+        </item>
+        <item>
+            <type>html</type>
+            <name>detailTabIntro</name>
+            <xpath>div[class=p-parameter] ul[id=parameter2]</xpath>
+            <regex></regex>
+        </item>
+    </selector>
+    </selectors>
+    
+</syntun>

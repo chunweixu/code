@@ -1,0 +1,82 @@
+package com.syntun.extractor;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.syntun.extractor.Selector.Node;
+
+public class WebInfoTemplate {
+    private List<Selector> selectorList = null;
+    
+	public List<Selector> getSelectorList() {
+		return selectorList;
+	}
+
+	public WebInfoTemplate(String string) {
+		// TODO Auto-generated constructor stub
+		this.selectorList = parseXml(string);
+	}
+	
+	private List<Selector> parseXml(String fileName) {
+    	ArrayList<Selector> list = new ArrayList<Selector>();
+    	Document m_configRoot = null;
+		try {
+			m_configRoot = Jsoup.parse(new File(fileName), "utf-8");
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		Elements elements = m_configRoot.getElementsByTag("selector");
+		for (Element element : elements) {
+			Selector selector = new Selector();
+			selector.setSelectorId(element.attr("id"));
+			for (Element element1 : element.children()) {
+				selector.addNode(parseNode(element1));
+			}
+			list.add(selector);
+		}
+    	return list;
+    }
+
+	private Node parseNode(Element element) {
+		Node node = new Selector().new Node();
+		try {
+			node.setType(element.select("type").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setName(element.select("name").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setXpath(element.select("xpath").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setRegex(element.select("regex").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return node;
+	}
+	
+	public static void main(String[] args) {
+		List<Selector> list = new ArrayList<Selector>();
+		WebInfoTemplate te = new WebInfoTemplate("template/jd.xml");
+		list = te.getSelectorList();
+		System.out.println(list);
+	}
+}

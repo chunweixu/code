@@ -1,0 +1,30 @@
+<infoExtractor>
+<rawpage>
+    <type>kafka</type>
+    <zookeeper>192.168.0.202:2181,192.168.0.203:2181,192.168.0.204:2181</zookeeper>
+    <topic>syntun_rawpage</topic>
+    <group>infoExtractor</group>
+</rawpage>
+
+<extractors>
+    <extractor name="Statistic">
+        <redis_server>192.168.0.95</redis_server>
+        <redis_port>6379</redis_port>
+        <redis_passwd></redis_passwd>
+    </extractor>
+    <extractor name="PageType">
+        <rulefile>/home/cuilun/scrawler/info-extractor/config/pagetype.xml</rulefile>
+    </extractor>
+    <extractor name="PageInfo">
+        <templatepath>/home/cuilun/scrawler/info-extractor/template</templatepath>
+    </extractor>
+</extractors>
+
+<writers>
+    <writer type="hbase">
+        <table>pagebase</table>
+        <rule>etc/transRule.xml</rule>
+    </writer>
+</writers>
+
+</infoExtractor>

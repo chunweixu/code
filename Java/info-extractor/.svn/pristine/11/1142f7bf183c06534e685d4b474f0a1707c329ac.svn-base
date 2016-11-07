@@ -1,0 +1,113 @@
+package com.syntun.extractor;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import com.syntun.extractor.XpathSelector.Node;
+
+public class PageInfoManager {
+	private static Logger logger = LogManager.getLogger(PageInfoManager.class.getName());
+	private Map<String, PageInfoTemplate> map = new HashMap<String, PageInfoTemplate>();
+    
+    public Map<String, PageInfoTemplate> getMap() {
+		return map;
+    }
+
+	public boolean load(String tempDir) {
+		File dir;
+		try {
+			dir = new File(tempDir);
+		    for (File file : dir.listFiles()) {
+			    PageInfoTemplate template = new PageInfoTemplate();
+			    if (template.initTemplate(file.toString())) {
+			    	String[] domains = template.getDomains();
+			    	for (int i = 0; i < domains.length; i++) {
+			    		map.put(domains[i].toLowerCase(), template);
+			    	}
+			    } else {
+			    	System.err.println("Initialize template failure");
+			    	return false;
+			    }
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+			return true;
+    }
+	
+	public List<XpathSelector> extractPageInfo(String html, String baseUri) {
+	    List<XpathSelector> selectorList = parse(baseUri);
+	    if (selectorList == null) {
+	    	return null;
+	    }
+	    //Document doc = Jsoup.connect(html).get();
+	    Document doc = Jsoup.parse(html, baseUri);
+	    for (XpathSelector selector : selectorList) {
+	    	for (Node obj : selector.getNodes()) {
+		    	selectInfo(doc, obj);
+	    	}
+	    }
+	    return selectorList;
+	}
+	    
+	private void selectInfo(Document doc, Node node) {
+	    if (node.getType().equals("text")) {
+	    	Elements elements = doc.select(node.getXpath());
+	    	String value=elements.text();
+	        if (!node.getPattern().equals(null)) {
+	        	value=getToken(elements.text(), node.getPattern());
+	        }
+	        node.setNodeParseValue(value);
+	    } else if (node.getType().equals("img")) {
+	    	Elements elements = doc.select(node.getXpath() + "[src]");
+	    	String value=elements.text();
+	    	if (!node.getPattern().equals(null)) {
+	    		value=getToken(elements.attr("abs:src"), node.getPattern());
+	        }
+	    	node.setNodeParseValue(value);
+	    }
+	}
+	    
+	private String getToken(String text, Pattern pattern) {
+	    ArrayList<String> tokens = new ArrayList<String>();
+		Matcher m = pattern.matcher(text);
+		while (m.find()) {
+			tokens.add(m.group());
+		}
+		return tokens.toString();
+	}
+	
+	//根据url匹配相应模板
+	private List parse(String baseUri) {
+		String domain;
+		try {
+			domain = new URI(baseUri).getHost().toLowerCase();
+			if (getMap().containsKey(domain)) {
+				List selectorList = getMap().get(domain).getSelectorList();
+				return selectorList;
+			} else {
+				logger.warn("Match template failure");
+				return null;
+			}
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+}

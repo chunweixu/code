@@ -1,0 +1,45 @@
+<syntun id = "jd">
+	<selector id = "test">
+        <biaoti>
+            <type>text</type>
+            <name>title</name>
+            <xpath>html title</xpath>
+            <regex></regex>
+        </biaoti>
+    </selector>
+    <selector id = "a">
+        <id>
+            <type>text</type>
+            <name>ID</name>
+            <xpath>html body[class=cat-1-670 cat-2-671 cat-3-2694 item-996967 JD JD-1] div[id=p-box] div[class=w] div[id=product-intro] div[id=preview] div[id=short-share] div[class=fl] span</xpath>
+            <regex></regex>
+        </id>
+        <biaoti>
+            <type>text</type>
+            <name>title</name>
+            <xpath>html body[class=cat-1-670 cat-2-671 cat-3-2694 item-996967 JD JD-1] div[id=p-box] div[class=w] div[id=product-intro] div[class=m-item-inner] div[id=itemInfo] div[id=name] h1</xpath>
+            <regex></regex>
+        </biaoti>
+        <category>
+            <type>text</type>
+            <name>category</name>
+            <xpath>html body[class=cat-1-670 cat-2-671 cat-3-2694 item-996967 JD JD-1] div[id=root-nav] div[class=w] div[class=breadcrumb] span</xpath>
+            <regex></regex>
+        </category>
+    </selector>
+    <selector id = "quanqiugou">
+        <id>
+            <type>text</type>
+            <name>ID</name>
+            <xpath>html[class=root61] body div[class=product-detail w] div[id=preview] div[id=short-share] div[id=summary-market] span</xpath>
+            <regex></regex>
+        </id>
+        <biaoti>
+            <type>text</type>
+            <name>title</name>
+            <xpath>html[class=root61] body div[class=product-detail w] div[class=detail-items ] div[id=itemInfo] div[id=name] h1</xpath>
+            <regex></regex>
+        </biaoti>
+    </selector>
+    
+</syntun>

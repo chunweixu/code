@@ -1,0 +1,119 @@
+package com.syntun.extractor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.json.JSONObject;
+import org.jsoup.nodes.Element;
+
+public class JsonSelector implements Selector {
+	private String selectorId;
+	private Set<ItemNode> nodes;
+	
+	@Override
+	public String toString() {
+		return "Selector [selectorId=" + selectorId + ", nodes=" + nodes + "]";
+	}
+
+	public String getSelectorId() {
+		return selectorId;
+	}
+
+	public Set<ItemNode> getNodes() {
+		return nodes;
+	}
+
+	public boolean initSelector(Element element) {
+		try {
+			selectorId = element.attr("id");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.err.println("Lack of attribute id");
+			return false;
+		}
+		try {
+			for (Element element1 : element.children()) {
+				if (this.nodes == null) {
+					this.nodes = new HashSet<ItemNode>();
+				}
+				nodes.add(parseNode(element1));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	private ItemNode parseNode(Element element) {
+		ItemNode node = new ItemNode();
+		try {
+			node.setType(element.select("type").text());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node.setName(element.select("name").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			node.setJsonPath(element.select("jsonPath").text());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			String pattern = element.select("regex").text().trim();
+			if (pattern.equals("")) {
+				node.setPattern(null);
+			} else {
+				Pattern tokSplitter = Pattern.compile(pattern);
+				node.setPattern(tokSplitter);
+			};
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return node;
+	}
+
+	public List<Map<String, String>> extractPageInfo(String content,
+			String baseUri, List<Selector> selectorList) {
+		// TODO Auto-generated method stub
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		if (selectorList == null) {
+	    	return null;
+	    }
+		JSONObject json = new JSONObject(content);
+		for (Selector selector : selectorList) {
+	    	Map<String, String> map = new HashMap<String, String>();
+	    	for (ItemNode obj : selector.getNodes()) {
+		    	map.put(obj.getName(), selectInfo(json, obj));
+	    	}
+	    	list.add(map);
+	    }
+		return list;
+	}
+	
+	private String selectInfo(JSONObject json, ItemNode node) {
+		return null;
+	}
+		    
+	private String getToken(String text, Pattern pattern) {
+		ArrayList<String> tokens = new ArrayList<String>();
+	    Matcher m = pattern.matcher(text);
+		while (m.find()) {
+			tokens.add(m.group());
+		}
+		return tokens.toString();	
+	}
+}
